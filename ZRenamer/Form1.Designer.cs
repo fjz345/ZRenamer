@@ -40,17 +40,19 @@
             this.tbRegex = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cbFilterTXT = new System.Windows.Forms.CheckBox();
-            this.cbFilterMKV = new System.Windows.Forms.CheckBox();
+            this.cbEnableASS = new System.Windows.Forms.CheckBox();
+            this.cbEnableMP4 = new System.Windows.Forms.CheckBox();
+            this.cbEnableMKV = new System.Windows.Forms.CheckBox();
             this.lvFound = new System.Windows.Forms.ListView();
             this.tbRegexTest = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbInput
             // 
-            this.tbInput.Location = new System.Drawing.Point(12, 89);
+            this.tbInput.Location = new System.Drawing.Point(12, 40);
             this.tbInput.Name = "tbInput";
             this.tbInput.Size = new System.Drawing.Size(299, 20);
             this.tbInput.TabIndex = 0;
@@ -58,7 +60,7 @@
             // 
             // tbOutput
             // 
-            this.tbOutput.Location = new System.Drawing.Point(12, 202);
+            this.tbOutput.Location = new System.Drawing.Point(12, 89);
             this.tbOutput.Name = "tbOutput";
             this.tbOutput.Size = new System.Drawing.Size(299, 20);
             this.tbOutput.TabIndex = 1;
@@ -66,7 +68,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(27, 73);
+            this.label1.Location = new System.Drawing.Point(27, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(71, 13);
             this.label1.TabIndex = 2;
@@ -75,7 +77,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(27, 186);
+            this.label2.Location = new System.Drawing.Point(27, 73);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 13);
             this.label2.TabIndex = 3;
@@ -84,7 +86,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(314, 47);
+            this.label3.Location = new System.Drawing.Point(324, 24);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(111, 13);
             this.label3.TabIndex = 5;
@@ -94,12 +96,12 @@
             // 
             this.progressBar1.Location = new System.Drawing.Point(12, 462);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(576, 23);
+            this.progressBar1.Size = new System.Drawing.Size(670, 23);
             this.progressBar1.TabIndex = 6;
             // 
             // btnChooseFile
             // 
-            this.btnChooseFile.Location = new System.Drawing.Point(104, 60);
+            this.btnChooseFile.Location = new System.Drawing.Point(104, 11);
             this.btnChooseFile.Name = "btnChooseFile";
             this.btnChooseFile.Size = new System.Drawing.Size(75, 23);
             this.btnChooseFile.TabIndex = 7;
@@ -109,7 +111,7 @@
             // 
             // btnRename
             // 
-            this.btnRename.Location = new System.Drawing.Point(209, 415);
+            this.btnRename.Location = new System.Drawing.Point(255, 415);
             this.btnRename.Name = "btnRename";
             this.btnRename.Size = new System.Drawing.Size(189, 41);
             this.btnRename.TabIndex = 8;
@@ -119,16 +121,17 @@
             // 
             // tbRegex
             // 
-            this.tbRegex.Location = new System.Drawing.Point(12, 308);
+            this.tbRegex.Location = new System.Drawing.Point(12, 309);
             this.tbRegex.Name = "tbRegex";
             this.tbRegex.Size = new System.Drawing.Size(358, 20);
             this.tbRegex.TabIndex = 9;
             this.tbRegex.TextChanged += new System.EventHandler(this.tbRegex_TextChanged);
+            this.tbRegex.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbRegex_KeyPress);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(27, 292);
+            this.label4.Location = new System.Drawing.Point(27, 293);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(38, 13);
             this.label4.TabIndex = 10;
@@ -136,53 +139,74 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.cbFilterTXT);
-            this.groupBox1.Controls.Add(this.cbFilterMKV);
-            this.groupBox1.Location = new System.Drawing.Point(404, 309);
+            this.groupBox1.Controls.Add(this.cbEnableASS);
+            this.groupBox1.Controls.Add(this.cbEnableMP4);
+            this.groupBox1.Controls.Add(this.cbEnableMKV);
+            this.groupBox1.Location = new System.Drawing.Point(572, 309);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(184, 147);
+            this.groupBox1.Size = new System.Drawing.Size(110, 147);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "groupBox1";
             // 
-            // cbFilterTXT
+            // cbEnableASS
             // 
-            this.cbFilterTXT.AutoSize = true;
-            this.cbFilterTXT.Location = new System.Drawing.Point(6, 42);
-            this.cbFilterTXT.Name = "cbFilterTXT";
-            this.cbFilterTXT.Size = new System.Drawing.Size(47, 17);
-            this.cbFilterTXT.TabIndex = 1;
-            this.cbFilterTXT.Text = "TXT";
-            this.cbFilterTXT.UseVisualStyleBackColor = true;
-            this.cbFilterTXT.CheckedChanged += new System.EventHandler(this.cbFilterTXT_CheckedChanged);
+            this.cbEnableASS.AutoSize = true;
+            this.cbEnableASS.Checked = true;
+            this.cbEnableASS.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbEnableASS.Location = new System.Drawing.Point(61, 19);
+            this.cbEnableASS.Name = "cbEnableASS";
+            this.cbEnableASS.Size = new System.Drawing.Size(47, 17);
+            this.cbEnableASS.TabIndex = 5;
+            this.cbEnableASS.Text = "ASS";
+            this.cbEnableASS.UseVisualStyleBackColor = true;
+            this.cbEnableASS.CheckedChanged += new System.EventHandler(this.cbEnableASS_CheckedChanged);
             // 
-            // cbFilterMKV
+            // cbEnableMP4
             // 
-            this.cbFilterMKV.AutoSize = true;
-            this.cbFilterMKV.Location = new System.Drawing.Point(6, 19);
-            this.cbFilterMKV.Name = "cbFilterMKV";
-            this.cbFilterMKV.Size = new System.Drawing.Size(49, 17);
-            this.cbFilterMKV.TabIndex = 0;
-            this.cbFilterMKV.Text = "MKV";
-            this.cbFilterMKV.UseVisualStyleBackColor = true;
-            this.cbFilterMKV.CheckedChanged += new System.EventHandler(this.cbFilterMKV_CheckedChanged);
+            this.cbEnableMP4.AutoSize = true;
+            this.cbEnableMP4.Checked = true;
+            this.cbEnableMP4.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbEnableMP4.Location = new System.Drawing.Point(6, 42);
+            this.cbEnableMP4.Name = "cbEnableMP4";
+            this.cbEnableMP4.Size = new System.Drawing.Size(48, 17);
+            this.cbEnableMP4.TabIndex = 1;
+            this.cbEnableMP4.Text = "MP4";
+            this.cbEnableMP4.UseVisualStyleBackColor = true;
+            this.cbEnableMP4.CheckedChanged += new System.EventHandler(this.cbEnableMP4_CheckedChanged);
+            // 
+            // cbEnableMKV
+            // 
+            this.cbEnableMKV.AutoSize = true;
+            this.cbEnableMKV.Checked = true;
+            this.cbEnableMKV.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbEnableMKV.Location = new System.Drawing.Point(6, 19);
+            this.cbEnableMKV.Name = "cbEnableMKV";
+            this.cbEnableMKV.Size = new System.Drawing.Size(49, 17);
+            this.cbEnableMKV.TabIndex = 0;
+            this.cbEnableMKV.Text = "MKV";
+            this.cbEnableMKV.UseVisualStyleBackColor = true;
+            this.cbEnableMKV.CheckedChanged += new System.EventHandler(this.cbEnableMKV_CheckedChanged);
             // 
             // lvFound
             // 
-            this.lvFound.GridLines = true;
+            this.lvFound.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1});
+            this.lvFound.FullRowSelect = true;
+            this.lvFound.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lvFound.HideSelection = false;
-            this.lvFound.Location = new System.Drawing.Point(327, 73);
+            this.lvFound.Location = new System.Drawing.Point(327, 40);
             this.lvFound.Name = "lvFound";
             this.lvFound.ShowGroups = false;
-            this.lvFound.Size = new System.Drawing.Size(261, 220);
+            this.lvFound.Size = new System.Drawing.Size(355, 254);
             this.lvFound.TabIndex = 13;
             this.lvFound.UseCompatibleStateImageBehavior = false;
-            this.lvFound.View = System.Windows.Forms.View.List;
+            this.lvFound.View = System.Windows.Forms.View.Details;
             // 
             // tbRegexTest
             // 
             this.tbRegexTest.Enabled = false;
-            this.tbRegexTest.Location = new System.Drawing.Point(12, 334);
+            this.tbRegexTest.Location = new System.Drawing.Point(12, 335);
             this.tbRegexTest.Name = "tbRegexTest";
             this.tbRegexTest.Size = new System.Drawing.Size(86, 20);
             this.tbRegexTest.TabIndex = 14;
@@ -190,17 +214,22 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(101, 337);
+            this.label5.Location = new System.Drawing.Point(101, 338);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(178, 13);
             this.label5.TabIndex = 15;
             this.label5.Text = "Should see only the episode number";
             // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Name";
+            this.columnHeader1.Width = 257;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(600, 497);
+            this.ClientSize = new System.Drawing.Size(694, 497);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.tbRegexTest);
             this.Controls.Add(this.lvFound);
@@ -239,11 +268,13 @@
         private System.Windows.Forms.TextBox tbRegex;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.CheckBox cbFilterTXT;
-        private System.Windows.Forms.CheckBox cbFilterMKV;
+        private System.Windows.Forms.CheckBox cbEnableMP4;
+        private System.Windows.Forms.CheckBox cbEnableMKV;
         private System.Windows.Forms.ListView lvFound;
         private System.Windows.Forms.TextBox tbRegexTest;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox cbEnableASS;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
     }
 }
 

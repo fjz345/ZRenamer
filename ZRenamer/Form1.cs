@@ -23,6 +23,13 @@ namespace ZRenamer
         {
             tbRegex.Text = patternEpisodeNr;
         }
+            
+
+        // Called by Main to set args[0] as inputName
+        public void SetInputName(string inputName)
+        {
+            inputFileName = inputName;
+        }
 
         private void UpdateFoundFiles()
         {
@@ -71,16 +78,16 @@ namespace ZRenamer
         {
             for(int i = 0; i < lvFound.Items.Count; i++)
             {
-                lvFound.Items[i].BackColor = Color.Green;
+                lvFound.Items[i].BackColor = Color.Red;
 
-                foreach (var filter in map)
+                foreach (var ext in enabledExt)
                 {
-                    if (filter.Value == false)
+                    if (ext.Value == false)
                         continue;
 
-                    if ('.' + filter.Key == Path.GetExtension(lvFound.Items[i].Text))
+                    if ('.' + ext.Key == Path.GetExtension(lvFound.Items[i].Text))
                     {
-                        lvFound.Items[i].BackColor = Color.Red;
+                        lvFound.Items[i].BackColor = Color.Green;
                     }
                 }
             }
@@ -114,7 +121,7 @@ namespace ZRenamer
 
             // Format the input string to include number wildcards "hejsan01.txt" --> "hejsan??.txt"
             MatchEvaluator evaluator = new MatchEvaluator(ReplaceNum);
-            string f_filename = Regex.Replace(inputFileName, patternDigit, evaluator);
+            string f_filename = Regex.Replace(inputFileName, patternEpisodeNr, evaluator);
             Console.WriteLine("Formated name: " + f_filename);
 
             // Set output filename without extension
@@ -126,23 +133,55 @@ namespace ZRenamer
 
         public void PreviewRegex(string previewText)
         {
+            patternEpisodeNr = tbRegex.Text;
+
             // Get the specific number
-            Match match = Regex.Match(previewText, patternEpisodeNr);
+            Match match;
+            try
+            {
+                match = Regex.Match(previewText, patternEpisodeNr);
+            }
+            catch (System.ArgumentException)
+            {
+                Console.WriteLine("Preview Match Not successfull");
+                tbRegexTest.Text = "<Failed>";
+                tbRegexTest.BackColor = Color.Red;
+                return;
+            }
 
             string nr = match.Groups["episode"].Value;
             if (!match.Success)
             {
                 Console.WriteLine("Preview Match Not successfull");
                 tbRegexTest.Text = "<Failed>";
+                tbRegexTest.BackColor = Color.Red;
                 return;
             }
 
+            tbRegexTest.BackColor = Color.Green;
+
+            // https://regex101.com/
             tbRegexTest.Text = nr;
         }
 
         public static string ReplaceNum(Match match)
         {
-            return @"?";
+            string newString = "";
+
+            // Skip the fullgroup
+            for (int i = 1; i < match.Groups.Count; i++)
+            {
+                if(match.Groups[i].Name == "episode")
+                {
+                    newString += @"$episode$";
+                }
+                else
+                {
+                    newString += match.Groups[i].Value;
+                }
+            }
+
+            return newString;
         }
         public static string RemoveNum(Match match)
         {
@@ -158,9 +197,8 @@ namespace ZRenamer
 
         string directory = "";
         string inputFileName = "";
-        string patternDigit = @"\d";
         string patternEpisodeNr = @"(- )(?'episode'\d+)";
-        string patternNewName = @"\?+";
+        string patternNewName = @"(?'episode'\$episode\$)";
         private void btnChooseFile_Click(object sender, EventArgs e)
         {
             DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
@@ -183,11 +221,32 @@ namespace ZRenamer
                 return;
             }
 
+            RenameFiles();
 
+        }
 
+        private void RenameFiles()
+        {
             // Rename all the files
             for (int i = 0; i < lvFound.Items.Count; i++)
             {
+                bool skipItem = false;
+                // If item is filtered (red) go next
+                foreach (var ext in enabledExt)
+                {
+                    if ('.' + ext.Key == Path.GetExtension(lvFound.Items[i].Text) && ext.Value == false)
+                    {
+                        skipItem = true;
+                        break;
+                    }
+                }
+                
+                if(skipItem)
+                {
+                    continue;
+                }
+                
+
                 // Get the specific number
                 Match match = Regex.Match(lvFound.Items[i].ToString(), patternEpisodeNr);
 
@@ -206,30 +265,32 @@ namespace ZRenamer
                 File.Move(lvFound.Items[i].Text, newFileName + Path.GetExtension(lvFound.Items[i].Text));
 
                 Console.WriteLine(newFileName);
+
+                // Change input to new name
+                tbInput.Text = Path.GetFullPath(newFileName + Path.GetExtension(lvFound.Items[i].Text));
+
+                ProcessInput();
             }
-
         }
 
 
-        Dictionary<string, bool> map = new Dictionary<string, bool>()
+        Dictionary<string, bool> enabledExt = new Dictionary<string, bool>()
         {
-            {"mkv", false},
-            {"txt", false},
+            {"mkv", true},
+            {"mp4", true},
+
+            {"ass", true},
         };
-            
-        private void cbFilterMKV_CheckedChanged(object sender, EventArgs e)
-        {
-            map["mkv"] = cbFilterMKV.Checked;
-            MarkFilteredItems();
-        }
-
-        private void cbFilterTXT_CheckedChanged(object sender, EventArgs e)
-        {
-            map["txt"] = cbFilterTXT.Checked;
-            MarkFilteredItems();
-        }
 
         private void tbInput_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Return)
+            {
+                ProcessInput();
+            }
+        }
+
+        private void tbRegex_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
             {
@@ -241,5 +302,25 @@ namespace ZRenamer
         {
             PreviewRegex(inputFileName);
         }
+
+        private void cbEnableMP4_CheckedChanged(object sender, EventArgs e)
+        {
+            enabledExt["MP4"] = cbEnableMP4.Checked;
+            MarkFilteredItems();
+        }
+
+        private void cbEnableASS_CheckedChanged(object sender, EventArgs e)
+        {
+            enabledExt["ass"] = cbEnableASS.Checked;
+            MarkFilteredItems();
+        }
+
+        private void cbEnableMKV_CheckedChanged(object sender, EventArgs e)
+        {
+            enabledExt["mkv"] = cbEnableMKV.Checked;
+            MarkFilteredItems();
+        }
+
+        
     }
 }
