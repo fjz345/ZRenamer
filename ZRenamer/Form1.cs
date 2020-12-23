@@ -287,8 +287,6 @@ namespace ZRenamer
                 string newFileName = Regex.Replace(tbOutput.Text, patternNewName, evaluatorNewName);
 
                 pbProgress.Value = (int)((float)i / (float)lvFound.Items.Count * 100);
-                Console.WriteLine(pbProgress.Value);
-                Thread.Sleep(500);
 
                 try
                 {
