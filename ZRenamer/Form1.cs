@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace ZRenamer
 {
@@ -21,7 +22,7 @@ namespace ZRenamer
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            tbRegex.Text = patternEpisodeNr;
+            tbRegex.Text = episodeNrPattern;
         }
             
 
@@ -41,18 +42,11 @@ namespace ZRenamer
                 string[] files = Directory.GetFiles(directory);
                 foreach (string f in files)
                 {
-                    Match match = Regex.Match(f, patternEpisodeNr);
-
-                    if (!match.Success)
-                    {
-                        // skip
-                    }
-                    else
-                    {
-                        foundFiles.Add(f);
-                    }
+                    foundFiles.Add(f);
                 }
-                Console.WriteLine("The number of files starting with is {0}.", foundFiles.Count);
+
+                Console.WriteLine("Listing current directory:::::::::::::::::::::::::::");
+                Console.WriteLine("Number of files: {0}.", foundFiles.Count);
             }
             catch (Exception err)
             {
@@ -67,28 +61,61 @@ namespace ZRenamer
                 Console.WriteLine(dir);
 
                 lvFound.Items.Add(Path.GetFileName(dir));
-
             }
 
-            // Mark Filtered Items
-            MarkFilteredItems();
+            // Mark color items
+            MarkColoredItems();
+
+            Console.WriteLine("End of directory::::::::::::::::::::::::::::::::::::");
         }
 
-        public void MarkFilteredItems()
+        // With "if('.' + ext.key == ...)"
+        public bool IsValidExtension(string extension)
         {
-            for(int i = 0; i < lvFound.Items.Count; i++)
+            bool isValid = false;
+
+            // Always return true
+            if(isIgnoreExtensionsd == true)
+            { 
+                return true;
+            }
+
+            foreach (var ext in enabledExt)
             {
-                lvFound.Items[i].BackColor = Color.Red;
-
-                foreach (var ext in enabledExt)
+                if (ext.Value == true)
                 {
-                    if (ext.Value == false)
-                        continue;
-
-                    if ('.' + ext.Key == Path.GetExtension(lvFound.Items[i].Text))
+                    // Check if string matches
+                    if ('.' + ext.Key == extension)
                     {
-                        lvFound.Items[i].BackColor = Color.Green;
+                        isValid = true;
+                        break;
                     }
+                }
+            }
+
+            return isValid;
+        }
+
+        public void MarkColoredItems()
+        {
+            for (int i = 0; i < lvFound.Items.Count; i++)
+            {
+                // OK color
+                lvFound.Items[i].BackColor = Color.Green;
+
+                bool isValid = IsValidExtension(Path.GetExtension(lvFound.Items[i].Text));
+                if (!isValid)
+                {
+                    lvFound.Items[i].BackColor = Color.Red;
+                    continue;
+                }
+
+                // If previewRegex fails, set yellow
+                Match m = PreviewRegex(lvFound.Items[i].Text);
+                if (!m.Success)
+                {
+                    lvFound.Items[i].BackColor = Color.Yellow;
+                    continue;
                 }
             }
         }
@@ -112,56 +139,58 @@ namespace ZRenamer
                 return;
             }
             
-
             // Update foundFiles
             UpdateFoundFiles();
 
 
-
-
-            // Format the input string to include number wildcards "hejsan01.txt" --> "hejsan??.txt"
+            // Format the input string to include number wildcards "hejsan01.txt" --> "hejsan$episode$.txt"
             MatchEvaluator evaluator = new MatchEvaluator(ReplaceNum);
-            string f_filename = Regex.Replace(inputFileName, patternEpisodeNr, evaluator);
-            Console.WriteLine("Formated name: " + f_filename);
-
+            string f_filename = Regex.Replace(inputFileName, episodeNrPattern, evaluator);
+            
             // Set output filename without extension
             tbOutput.Text = Path.GetFileNameWithoutExtension(f_filename);
 
-
-            PreviewRegex(inputFileName);
+            UpdatePreviewRegex();
         }
 
-        public void PreviewRegex(string previewText)
+        public Match PreviewRegex(string previewText)
         {
-            patternEpisodeNr = tbRegex.Text;
-
-            // Get the specific number
             Match match;
             try
             {
-                match = Regex.Match(previewText, patternEpisodeNr);
+                match = Regex.Match(previewText, episodeNrPattern);
             }
             catch (System.ArgumentException)
             {
-                Console.WriteLine("Preview Match Not successfull");
-                tbRegexTest.Text = "<Failed>";
+                Console.WriteLine("ERROR::::::Preview Failed");
+                tbRegexTest.Text = "<Error>";
                 tbRegexTest.BackColor = Color.Red;
-                return;
+                return Match.Empty;
             }
 
-            string nr = match.Groups["episode"].Value;
+            return match;
+        }
+
+        // Changes color of the box under regex input.
+        public void UpdatePreviewRegex()
+        {
+            Match match = PreviewRegex(tbInput.Text);
             if (!match.Success)
             {
                 Console.WriteLine("Preview Match Not successfull");
                 tbRegexTest.Text = "<Failed>";
                 tbRegexTest.BackColor = Color.Red;
-                return;
+                tbRegexTest.ForeColor = Color.Black;
             }
+            else
+            {
+                tbRegexTest.BackColor = Color.Green;
+                tbRegexTest.ForeColor = Color.Black;
 
-            tbRegexTest.BackColor = Color.Green;
-
-            // https://regex101.com/
-            tbRegexTest.Text = nr;
+                // https://regex101.com/
+                string nr = match.Groups["episode"].Value;
+                tbRegexTest.Text = nr;
+            }
         }
 
         public static string ReplaceNum(Match match)
@@ -191,24 +220,24 @@ namespace ZRenamer
         public static string nrToReplace = "";
         public static string ReplaceQ(Match match)
         {
-            Console.WriteLine(match.Value);
             return nrToReplace;
         }
 
         string directory = "";
         string inputFileName = "";
-        string patternEpisodeNr = @"(- )(?'episode'\d+)";
+        string episodeNrPattern = @"(- )(?<episode>\d+)";
         string patternNewName = @"(?'episode'\$episode\$)";
         private void btnChooseFile_Click(object sender, EventArgs e)
         {
+            // Stupid forms can not select folders
             DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
-            string file = "";
+            string path = "";
             if (result == DialogResult.OK) // Test result.
             {
-                file = openFileDialog1.FileName;
+                path = openFileDialog1.FileName;
 
-                tbInput.Text = file;
-                Console.WriteLine(file); // <-- Shows file size in debugging mode.
+                tbInput.Text = path;
+                Console.WriteLine(path);
             }
 
             ProcessInput();
@@ -222,63 +251,82 @@ namespace ZRenamer
             }
 
             RenameFiles();
-
         }
 
         private void RenameFiles()
         {
+            string oldOutputText = tbOutput.Text;
+            string oldInputText = tbInput.Text;
+
+            Console.WriteLine("Renaming Files....");
+
+            pbProgress.Value = 0;
+
             // Rename all the files
             for (int i = 0; i < lvFound.Items.Count; i++)
             {
-                bool skipItem = false;
                 // If item is filtered (red) go next
-                foreach (var ext in enabledExt)
-                {
-                    if ('.' + ext.Key == Path.GetExtension(lvFound.Items[i].Text) && ext.Value == false)
-                    {
-                        skipItem = true;
-                        break;
-                    }
-                }
-                
-                if(skipItem)
+                if(!IsValidExtension(Path.GetExtension(lvFound.Items[i].Text)))
                 {
                     continue;
                 }
                 
 
                 // Get the specific number
-                Match match = Regex.Match(lvFound.Items[i].ToString(), patternEpisodeNr);
+                Match match = Regex.Match(lvFound.Items[i].ToString(), episodeNrPattern);
 
                 string nr = match.Groups["episode"].Value;
                 if (!match.Success)
                 {
-                    Console.WriteLine("Match Not successfull");
-                    return;
+                    Console.WriteLine("{0}: Match Not successfull", lvFound.Items[i].Text);
+                    continue;
                 }
 
                 nrToReplace = nr;
                 MatchEvaluator evaluatorNewName = new MatchEvaluator(ReplaceQ);
                 string newFileName = Regex.Replace(tbOutput.Text, patternNewName, evaluatorNewName);
 
-                // Rember that the extension is not in the string
-                File.Move(lvFound.Items[i].Text, newFileName + Path.GetExtension(lvFound.Items[i].Text));
+                pbProgress.Value = (int)((float)i / (float)lvFound.Items.Count * 100);
+                Console.WriteLine(pbProgress.Value);
+                Thread.Sleep(500);
+
+                try
+                {
+                    // Add extension aswell
+                    System.IO.File.Move(lvFound.Items[i].Text, newFileName + Path.GetExtension(lvFound.Items[i].Text));
+                }
+                catch (System.IO.IOException)
+                {
+                    Console.WriteLine("File with name '{0}' already exists!, skipping....", newFileName + Path.GetExtension(lvFound.Items[i].Text));
+                    continue;
+                }
+
+                
 
                 Console.WriteLine(newFileName);
-
-                // Change input to new name
-                tbInput.Text = Path.GetFullPath(newFileName + Path.GetExtension(lvFound.Items[i].Text));
-
-                ProcessInput();
             }
+
+            pbProgress.Value = 100;
+
+            Console.WriteLine("Finished renaming files....");
+
+
+            // Update
+            ProcessInput();
+
+            // Change text boxes
+            tbOutput.Text = oldOutputText;
+
+            MatchEvaluator ev = new MatchEvaluator(ReplaceQ);
+            string newInputName = Regex.Replace(oldInputText, patternNewName, ev);
+            tbInput.Text = newInputName;
         }
 
-
+        bool isIgnoreExtensionsd = false;
         Dictionary<string, bool> enabledExt = new Dictionary<string, bool>()
         {
             {"mkv", true},
             {"mp4", true},
-
             {"ass", true},
         };
 
@@ -300,27 +348,38 @@ namespace ZRenamer
 
         private void tbRegex_TextChanged(object sender, EventArgs e)
         {
-            PreviewRegex(inputFileName);
+            episodeNrPattern = tbRegex.Text;
+            PreviewRegex(tbInput.Text);
+            UpdatePreviewRegex();
+
+            MarkColoredItems();
         }
 
         private void cbEnableMP4_CheckedChanged(object sender, EventArgs e)
         {
             enabledExt["MP4"] = cbEnableMP4.Checked;
-            MarkFilteredItems();
+            MarkColoredItems();
         }
 
         private void cbEnableASS_CheckedChanged(object sender, EventArgs e)
         {
             enabledExt["ass"] = cbEnableASS.Checked;
-            MarkFilteredItems();
+            MarkColoredItems();
         }
 
         private void cbEnableMKV_CheckedChanged(object sender, EventArgs e)
         {
             enabledExt["mkv"] = cbEnableMKV.Checked;
-            MarkFilteredItems();
+            MarkColoredItems();
         }
 
-        
+        private void cbIgnoreExtension_CheckedChanged(object sender, EventArgs e)
+        {
+            isIgnoreExtensionsd = cbIgnoreExtension.Checked;
+            MarkColoredItems();
+
+            // Disable Extension screen
+            gbExtensions.Enabled = !isIgnoreExtensionsd;
+        }
     }
 }

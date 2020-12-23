@@ -32,22 +32,23 @@
             this.tbOutput = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.lbFound = new System.Windows.Forms.Label();
+            this.pbProgress = new System.Windows.Forms.ProgressBar();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.btnChooseFile = new System.Windows.Forms.Button();
             this.btnRename = new System.Windows.Forms.Button();
             this.tbRegex = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.gbExtensions = new System.Windows.Forms.GroupBox();
             this.cbEnableASS = new System.Windows.Forms.CheckBox();
             this.cbEnableMP4 = new System.Windows.Forms.CheckBox();
             this.cbEnableMKV = new System.Windows.Forms.CheckBox();
             this.lvFound = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tbRegexTest = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.groupBox1.SuspendLayout();
+            this.cbIgnoreExtension = new System.Windows.Forms.CheckBox();
+            this.gbExtensions.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbInput
@@ -70,9 +71,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(27, 24);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(71, 13);
+            this.label1.Size = new System.Drawing.Size(49, 13);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Input name(s)";
+            this.label1.Text = "Directory";
             // 
             // label2
             // 
@@ -83,21 +84,21 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Output name(s)";
             // 
-            // label3
+            // lbFound
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(324, 24);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(111, 13);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Found files in same dir";
+            this.lbFound.AutoSize = true;
+            this.lbFound.Location = new System.Drawing.Point(324, 24);
+            this.lbFound.Name = "lbFound";
+            this.lbFound.Size = new System.Drawing.Size(58, 13);
+            this.lbFound.TabIndex = 5;
+            this.lbFound.Text = "Files found";
             // 
-            // progressBar1
+            // pbProgress
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 462);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(670, 23);
-            this.progressBar1.TabIndex = 6;
+            this.pbProgress.Location = new System.Drawing.Point(12, 462);
+            this.pbProgress.Name = "pbProgress";
+            this.pbProgress.Size = new System.Drawing.Size(753, 23);
+            this.pbProgress.TabIndex = 6;
             // 
             // btnChooseFile
             // 
@@ -105,13 +106,13 @@
             this.btnChooseFile.Name = "btnChooseFile";
             this.btnChooseFile.Size = new System.Drawing.Size(75, 23);
             this.btnChooseFile.TabIndex = 7;
-            this.btnChooseFile.Text = "Choose file";
+            this.btnChooseFile.Text = "Choose dir";
             this.btnChooseFile.UseVisualStyleBackColor = true;
             this.btnChooseFile.Click += new System.EventHandler(this.btnChooseFile_Click);
             // 
             // btnRename
             // 
-            this.btnRename.Location = new System.Drawing.Point(255, 415);
+            this.btnRename.Location = new System.Drawing.Point(291, 415);
             this.btnRename.Name = "btnRename";
             this.btnRename.Size = new System.Drawing.Size(189, 41);
             this.btnRename.TabIndex = 8;
@@ -137,17 +138,17 @@
             this.label4.TabIndex = 10;
             this.label4.Text = "Regex";
             // 
-            // groupBox1
+            // gbExtensions
             // 
-            this.groupBox1.Controls.Add(this.cbEnableASS);
-            this.groupBox1.Controls.Add(this.cbEnableMP4);
-            this.groupBox1.Controls.Add(this.cbEnableMKV);
-            this.groupBox1.Location = new System.Drawing.Point(572, 309);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(110, 147);
-            this.groupBox1.TabIndex = 12;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "groupBox1";
+            this.gbExtensions.Controls.Add(this.cbEnableASS);
+            this.gbExtensions.Controls.Add(this.cbEnableMP4);
+            this.gbExtensions.Controls.Add(this.cbEnableMKV);
+            this.gbExtensions.Location = new System.Drawing.Point(655, 332);
+            this.gbExtensions.Name = "gbExtensions";
+            this.gbExtensions.Size = new System.Drawing.Size(110, 124);
+            this.gbExtensions.TabIndex = 12;
+            this.gbExtensions.TabStop = false;
+            this.gbExtensions.Text = "Extensions";
             // 
             // cbEnableASS
             // 
@@ -198,10 +199,15 @@
             this.lvFound.Location = new System.Drawing.Point(327, 40);
             this.lvFound.Name = "lvFound";
             this.lvFound.ShowGroups = false;
-            this.lvFound.Size = new System.Drawing.Size(355, 254);
+            this.lvFound.Size = new System.Drawing.Size(438, 254);
             this.lvFound.TabIndex = 13;
             this.lvFound.UseCompatibleStateImageBehavior = false;
             this.lvFound.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Name";
+            this.columnHeader1.Width = 257;
             // 
             // tbRegexTest
             // 
@@ -220,35 +226,42 @@
             this.label5.TabIndex = 15;
             this.label5.Text = "Should see only the episode number";
             // 
-            // columnHeader1
+            // cbIgnoreExtension
             // 
-            this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 257;
+            this.cbIgnoreExtension.AutoSize = true;
+            this.cbIgnoreExtension.Location = new System.Drawing.Point(660, 309);
+            this.cbIgnoreExtension.Name = "cbIgnoreExtension";
+            this.cbIgnoreExtension.Size = new System.Drawing.Size(105, 17);
+            this.cbIgnoreExtension.TabIndex = 6;
+            this.cbIgnoreExtension.Text = "Ignore Extension";
+            this.cbIgnoreExtension.UseVisualStyleBackColor = true;
+            this.cbIgnoreExtension.CheckedChanged += new System.EventHandler(this.cbIgnoreExtension_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(694, 497);
+            this.ClientSize = new System.Drawing.Size(777, 498);
+            this.Controls.Add(this.cbIgnoreExtension);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.tbRegexTest);
             this.Controls.Add(this.lvFound);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.gbExtensions);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tbRegex);
             this.Controls.Add(this.btnRename);
             this.Controls.Add(this.btnChooseFile);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.pbProgress);
+            this.Controls.Add(this.lbFound);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tbOutput);
             this.Controls.Add(this.tbInput);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "ZRenamer";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.gbExtensions.ResumeLayout(false);
+            this.gbExtensions.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -260,14 +273,14 @@
         private System.Windows.Forms.TextBox tbOutput;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Label lbFound;
+        private System.Windows.Forms.ProgressBar pbProgress;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button btnChooseFile;
         private System.Windows.Forms.Button btnRename;
         private System.Windows.Forms.TextBox tbRegex;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox gbExtensions;
         private System.Windows.Forms.CheckBox cbEnableMP4;
         private System.Windows.Forms.CheckBox cbEnableMKV;
         private System.Windows.Forms.ListView lvFound;
@@ -275,6 +288,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.CheckBox cbEnableASS;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.CheckBox cbIgnoreExtension;
     }
 }
 
